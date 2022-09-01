@@ -34,4 +34,4 @@ jobs:
 #       - name: Build
 #         run: yarn build
       - name: Deploy
-        run: aws s3 sync ./*.plan s3://terraformdemo1497
+        run: aws s3 sync *.plan s3://vennabucket333
