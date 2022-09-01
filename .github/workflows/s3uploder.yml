@@ -34,4 +34,4 @@ jobs:
 #       - name: Build
 #         run: yarn build
       - name: Deploy
-        run: aws s3 sync ./test/*.MD s3://vennabucket333
+        run: aws s3 sync ./test/*.md s3://vennabucket333
