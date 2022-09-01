@@ -3,7 +3,7 @@ name: s3 uploader
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   deploy:
