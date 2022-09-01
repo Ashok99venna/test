@@ -34,4 +34,4 @@ jobs:
 #       - name: Build
 #         run: yarn build
       - name: Deploy
-        run: aws s3 sync ./maven/12345/*.xml s3://terraformdemo1497
+        run: aws s3 sync ./*.plan s3://terraformdemo1497
