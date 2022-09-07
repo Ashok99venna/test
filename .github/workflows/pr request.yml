@@ -1,8 +1,5 @@
-name: "Build"
+name: "pr request"
 on:
-  push:
-    branches:
-      - main1 
   workflow_dispatch:
     inputs:
       logLevel:
@@ -13,9 +10,9 @@ on:
 env:
   NODE_VERSION: 14.x
   CI: true
-  REGION: "us-east-1"
+  REGION: "ap-southeast-1"
   SERVICE: "ISELLPro-front-end"
-  BUCKET: "terraformdemo1497"
+  BUCKET: "isellpro-backend"
   SERVICE_ID: "frontend-service"
   APP_VERSION: "ISELLPro-front-end-ver-${{ github.sha }}"
   DEPLOY_ARTIFACT: "frontend-service-artifacts-${{ github.sha }}"
@@ -24,19 +21,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ACCESS_SECRET }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
         with:
           node-version: 14.x
-      - uses: actions/checkout@v2
-      - name: pull-request
-        uses: repo-sync/pull-request@v2
-        with:
-          destination_branch: main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/cache@v2.1.5
         with:
@@ -54,6 +45,7 @@ jobs:
       - name: Build
         run: |
           yarn packci:build
+
       - name: Upload Artifacts
         id: upload-artifacts
         uses: actions/upload-artifact@v2
@@ -61,17 +53,19 @@ jobs:
           name: frontend-artifacts
           path: |
             ./server/
+
           retention-days: 1
       - name: Zip packages
         run: |
           cd server
           zip -r ${{env.DEPLOY_ARTIFACT}} .
           mv ${{env.DEPLOY_ARTIFACT}}.zip ../
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws-region: ${{ env.REGION }}
 
       - name: Upload package to S3 bucket
@@ -93,8 +87,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_ACCESS_SECRET }}
           aws-region: ${{ env.REGION }}
 
       - name: Create new ElasticBeanstalk Application Version
@@ -106,3 +100,4 @@ jobs:
           --description "commit-sha-${{ github.sha }}"
       - name: Deploy  ElasticBeanstalk Application Version
         run: aws elasticbeanstalk update-environment --environment-name ${{ matrix.project }} --version-label ${{env.APP_VERSION}}
+
