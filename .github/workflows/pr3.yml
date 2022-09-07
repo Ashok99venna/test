@@ -3,7 +3,7 @@ name: pr3
 on:
   push:
     branches:
-      - main
+      - main1
 # jobs:
 #   createPullRequest:
 #     runs-on: ubuntu-latest
